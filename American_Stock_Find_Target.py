@@ -17,7 +17,8 @@ def get_historic_price(abbr, playwright, avg_type):
 
 
     # 找到輸入公司簡稱的input
-    page.get_by_placeholder("Quote Lookup").type(abbr, delay = 3000 + np.random.rand() * 1000)
+    page.get_by_placeholder("Quote Lookup").type(abbr, delay = 2000 + np.random.rand() * 2000)
+    # page.get_by_placeholder("Quote Lookup").focus()
     smart_hint_selector = "css=[data-id=search-assist-input-sugglst]"
     page.wait_for_selector(smart_hint_selector, state = "attached", timeout = 30000)
     page.keyboard.press("Enter", delay = np.random.rand() * 1000 + 1000)   
@@ -34,19 +35,35 @@ def get_historic_price(abbr, playwright, avg_type):
 
 
     # 點hisotorical data
-    type_selector = "#quote-nav > ul > li.IbBox.Fw\(500\).fin-tab-item.H\(44px\).desktop_Bgc\(\$hoverBgColor\)\:h.desktop-lite_Bgc\(\$hoverBgColor\)\:h.selected > a > span"           
+    # type_selector = "#quote-nav > ul > li.IbBox.Fw\(500\).fin-tab-item.H\(44px\).desktop_Bgc\(\$hoverBgColor\)\:h.desktop-lite_Bgc\(\$hoverBgColor\)\:h.selected > a > span"           
     #quote-nav > ul > li.IbBox.Fw\(500\).fin-tab-item.H\(44px\).desktop_Bgc\(\$hoverBgColor\)\:h.desktop-lite_Bgc\(\$hoverBgColor\)\:h.selected > a > span
     # page.wait_for_selector(type_selector, state = "attached", timeout = 30000).click(timeout = 5000, delay = np.random.rand() * 1000)
-    page.get_by_text("Historical Data").click(timeout = 5000, delay = np.random.rand() * 1000)
+    page.get_by_text("Historical Data").hover(timeout = 30000)
+    page.get_by_text("Historical Data").click(timeout = 30000, delay = np.random.rand() * 10000)
     print("點歷史資料")
 
     # 點Frequency: Monthly
-    page.get_by_text("Daily").click(timeout = 5000, delay = np.random.rand() * 1000)
+    # page.wait_for_selector(smart_hint_selector, state = "attached", timeout = 30000)
+    page.get_by_text("Daily").click(timeout = 30000, delay = np.random.rand() * 3000)
     menu = page.locator("data-test=historicalFrequency-menu")
     # page.locator("css=[data-value=1mo]").click(timeout = 5000, delay = np.random.rand() * 1000)
-    menu.get_by_text("Monthly").click(timeout = 5000, delay = np.random.rand() * 1000)
-    page.get_by_text("Apply").click(timeout = 5000, delay = np.random.rand() * 1000)
-    page.screenshot(path = "screenshot1.png")
+    menu.get_by_text("Monthly").click(timeout = 30000, delay = np.random.rand() * 3000)
+    print("選擇月為單位")
+    # range_menu = page.locator("id=dropdown-menu").click(timeout = 30000, delay = np.random.rand() * 1000)
+    # range_menu = page.locator("[data-test=dropdown]").click(timeout = 30000, delay = np.random.rand() * 3000)
+    range_menu = page.get_by_text("Aug 28, 2022 - Aug 28, 2023").click(timeout = 30000, delay = np.random.rand() * 3000)
+    print(range_menu.inner_html())
+    print("找到時間範圍選擇")
+    range_menu.get_by_text("5Y").click(timeout = 30000, delay = np.random.rand() * 3000)
+    # range_menu.get_by_text("Done").click(timeout = 30000, delay = np.random.rand() * 1000)
+
+    page.get_by_text("Apply").click(timeout = 30000, delay = np.random.rand() * 1000)
+    his_table = page.locator("data-test=historical-prices")
+    print(his_table.inner_text())
+    # page.screenshot(path = "screenshot1.png")
+
+
+
     print("OK")
 
     # current_url = page.url
