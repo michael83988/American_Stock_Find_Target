@@ -7,7 +7,7 @@ def get_historic_price(abbr, playwright, avg_type):
     url = "https://finance.yahoo.com/"
 
     chromium = playwright.chromium # or "firefox" or "webkit".    
-    browser = chromium.launch(headless = False) 
+    browser = chromium.launch(headless = False)
     context = browser.new_context(
         # viewport={'width': 1600, 'height':1200}
         )  # Allowed to create multiple pages with the same set of custom header
@@ -18,6 +18,8 @@ def get_historic_price(abbr, playwright, avg_type):
 
     # 找到輸入公司簡稱的input
     page.get_by_placeholder("Quote Lookup").type(abbr, delay = 3000 + np.random.rand() * 1000)
+    smart_hint_selector = "css=[data-id=search-assist-input-sugglst]"
+    page.wait_for_selector(smart_hint_selector, state = "attached", timeout = 30000)
     page.keyboard.press("Enter", delay = np.random.rand() * 1000 + 1000)   
 
     
@@ -41,7 +43,8 @@ def get_historic_price(abbr, playwright, avg_type):
     # 點Frequency: Monthly
     page.get_by_text("Daily").click(timeout = 5000, delay = np.random.rand() * 1000)
     menu = page.locator("data-test=historicalFrequency-menu")
-    page.locator("data-value=1mo").click(timeout = 5000, delay = np.random.rand() * 1000)
+    # page.locator("css=[data-value=1mo]").click(timeout = 5000, delay = np.random.rand() * 1000)
+    menu.get_by_text("Monthly").click(timeout = 5000, delay = np.random.rand() * 1000)
     page.get_by_text("Apply").click(timeout = 5000, delay = np.random.rand() * 1000)
     page.screenshot(path = "screenshot1.png")
     print("OK")
