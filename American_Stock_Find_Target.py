@@ -55,6 +55,7 @@ def get_historic_price(abbr, global_dict):
             page = context.new_page()  # Create a new page
             page.goto(url, timeout = 120000, wait_until = "domcontentloaded")
             print("'Yahoo finance' requested completely!")
+            time.sleep(2 + np.random.rand())
 
 
             # 找到輸入公司簡稱的input
