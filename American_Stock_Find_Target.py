@@ -68,7 +68,8 @@ def get_historic_price(abbr, global_dict, processed_num):
 
             
             # 取得跳轉該公司頁面後的公司名稱
-            com_name_selector = "#quote-header-info > div.Mt\(15px\).D\(f\).Pos\(r\) > div.D\(ib\).Mt\(-5px\).Maw\(38\%\)--tab768.Maw\(38\%\).Mend\(10px\).Ov\(h\).smartphone_Maw\(85\%\).smartphone_Mend\(0px\) > div.D\(ib\) > h1"
+            # com_name_selector = "#quote-header-info > div.Mt\(15px\).D\(f\).Pos\(r\) > div.D\(ib\).Mt\(-5px\).Maw\(38\%\)--tab768.Maw\(38\%\).Mend\(10px\).Ov\(h\).smartphone_Maw\(85\%\).smartphone_Mend\(0px\) > div.D\(ib\) > h1"
+            com_name_selector = "#nimbus-app > section > section > section > article > section.container.yf-ezk9pj > div.top.yf-ezk9pj > div > section > h1"
             company_name = page.wait_for_selector(com_name_selector, state = "attached", timeout = 30000).inner_text() 
 
 
@@ -87,18 +88,22 @@ def get_historic_price(abbr, global_dict, processed_num):
             time.sleep(5)
 
             # 點Frequency: Monthly
-            page.get_by_text("Daily").click(timeout = 120000, delay = 3000 + np.random.rand() * 1000)
+            # page.get_by_text("Daily").click(timeout = 120000, delay = 3000 + np.random.rand() * 1000)
+            page.get_by_label("Daily").click(timeout = 120000, delay = 3000 + np.random.rand() * 1000)
             # page.locator("span").filter(has_text = "Daily").click(timeout = 120000, delay = 3000 + np.random.rand() * 1000)
-            menu = page.locator("data-test=historicalFrequency-menu")
+            # menu = page.locator("data-test=historicalFrequency-menu")
+            menu=page.locator('css=div[class="dialog-content tw-top-10 tw-w-28 yf-ls3l1f"]')
             # page.locator("css=[data-value=1mo]").click(timeout = 5000, delay = np.random.rand() * 1000)
             menu.get_by_text("Monthly").click(timeout = 120000, delay = 3000 + np.random.rand() * 1000)
             # page.wait_for_load_state(timeout=120000)  # After 'load' event
             print("選擇月為單位")
             time.sleep(5)
 
-            page.locator("#Col1-1-HistoricalDataTable-Proxy > section > div.Pt\(15px\) > div.Bgc\(\$lv1BgColor\).Bdrs\(3px\).P\(10px\) > div:nth-child(1) > div > div").click(timeout = 120000, delay = 5000 + np.random.rand() * 2000)  # [data-test=dropdown]
+            # page.locator("#Col1-1-HistoricalDataTable-Proxy > section > div.Pt\(15px\) > div.Bgc\(\$lv1BgColor\).Bdrs\(3px\).P\(10px\) > div:nth-child(1) > div > div").click(timeout = 120000, delay = 5000 + np.random.rand() * 2000)  # [data-test=dropdown]
+            page.locator('#nimbus-app > section > section > section > article > div.container > div.container.yf-e8ilep > div.menuContainer.yf-1j5x891 > button').click(timeout=120000,delay = 5000 + np.random.rand() * 2000)
             # page.wait_for_load_state(timeout=120000)  # After 'load' event
-            range_menu = page.locator("#dropdown-menu")
+            # range_menu = page.locator("#dropdown-menu")
+            range_menu=page.locator('css=div[class="quickpicks yf-grkcsd"]')
             # range_menu = page.get_by_text("Aug 28, 2022 - Aug 28, 2023").click(timeout = 30000, delay = np.random.rand() * 3000)
             # print(range_menu.inner_html())
             
@@ -109,14 +114,15 @@ def get_historic_price(abbr, global_dict, processed_num):
 
             # page.get_by_text("Apply").click(timeout = 5000, delay = np.random.rand() * 1000)
 
-            page.get_by_text("Apply").click(timeout = 30000, delay = 3000 + np.random.rand() * 2000)
+            # page.get_by_text("Apply").click(timeout = 30000, delay = 3000 + np.random.rand() * 2000)
             # page.wait_for_load_state(timeout=120000)  # After 'load' event
-            print("按下Apply")
+            # print("按下Apply")
             
 
             # page.wait_for_load_state("")  # After 'load' event
-            time.sleep(5)
-            his_table = "<table>" + page.locator("data-test=historical-prices").inner_html() + "</table>"
+            # time.sleep(5)
+            # his_table = "<table>" + page.locator("data-test=historical-prices").inner_html() + "</table>"
+            his_table = "<table>" + page.locator('css=table[class="table yf-ewueuo"]').inner_html() + "</table>"
 
             # his_price_selector = "data-test=historical-prices"
             # his_table = page.wait_for_selector(his_price_selector, state = "visible", timeout = 120000)
@@ -132,14 +138,15 @@ def get_historic_price(abbr, global_dict, processed_num):
             def transform_to_number(content):
                 return float(str(content).replace(" ",""))
             
-            
+            @@沒有close*的欄位
             MA20_Month = np.average(df_his_price[df_his_price["Close*"].apply(want_value)]["Close*"].apply(transform_to_number).iloc[:20])
             print(company_name, "MA20 price:", MA20_Month)
 
 
 
             # 取得當前股價
-            Current_Price = float(page.locator("[data-test=qsp-price][data-field=regularMarketPrice]").inner_text(timeout=120000))
+            # Current_Price = float(page.locator("[data-test=qsp-price][data-field=regularMarketPrice]").inner_text(timeout=120000))
+            Current_Price = float(page.locator("[data-testid=qsp-price][data-field=regularMarketPrice]").inner_text(timeout=120000))
             print(company_name, "current price:", Current_Price)
 
             # 計算股價與MA20之比例
@@ -211,7 +218,7 @@ if __name__ == "__main__":
 
     # print(all_type_pages.keys())
     # print(len(all_type_pages['化學工業']))
-    abbrs = all_type_pages['化學工業'][:20]
+    abbrs = all_type_pages['化學工業'][:1]
     iter_args = []
     for abbr in abbrs:
         iter_args.append((abbr, global_dict, processed_num))
