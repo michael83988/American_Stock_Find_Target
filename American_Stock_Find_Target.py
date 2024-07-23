@@ -5,6 +5,7 @@ import numpy as np
 import time
 import pandas as pd
 import re
+import io
 from multiprocessing import Pool, get_start_method, Manager, Value
 from datetime import datetime
 
@@ -75,17 +76,19 @@ def get_historic_price(abbr, global_dict, processed_num):
 
 
             print("Get targeted company completely!")  
-            print(company_name)       
+            print(f'公司名稱：{company_name}') 
 
 
             # 點hisotorical data
             # type_selector = "#quote-nav > ul > li.IbBox.Fw\(500\).fin-tab-item.H\(44px\).desktop_Bgc\(\$hoverBgColor\)\:h.desktop-lite_Bgc\(\$hoverBgColor\)\:h.selected > a > span"           
             #quote-nav > ul > li.IbBox.Fw\(500\).fin-tab-item.H\(44px\).desktop_Bgc\(\$hoverBgColor\)\:h.desktop-lite_Bgc\(\$hoverBgColor\)\:h.selected > a > span
             # page.wait_for_selector(type_selector, state = "attached", timeout = 30000).click(timeout = 5000, delay = np.random.rand() * 1000)
-            page.get_by_text("Historical Data").click(timeout = 120000, delay = 3000 + np.random.rand() * 2000)
-            # page.wait_for_load_state(timeout=120000)  # After 'load' event
-            print("點歷史資料")
-            time.sleep(5)
+            while not page.get_by_label("Daily").is_visible():
+                page.get_by_text("Historical Data").click(timeout = 30000, delay = 1000 + np.random.rand() * 2000)
+                # page.wait_for_load_state(timeout=120000)  # After 'load' event
+                print("點歷史資料")
+                time.sleep(5)
+
 
             # 點Frequency: Monthly
             # page.get_by_text("Daily").click(timeout = 120000, delay = 3000 + np.random.rand() * 1000)
@@ -127,7 +130,7 @@ def get_historic_price(abbr, global_dict, processed_num):
             # his_price_selector = "data-test=historical-prices"
             # his_table = page.wait_for_selector(his_price_selector, state = "visible", timeout = 120000)
             # print(his_table)
-            df_his_price = pd.read_html(his_table, index_col=0, header=0)[0]
+            df_his_price = pd.read_html(io.StringIO(his_table), index_col=0, header=0)[0]
 
 
             def want_value(content):        
@@ -138,8 +141,9 @@ def get_historic_price(abbr, global_dict, processed_num):
             def transform_to_number(content):
                 return float(str(content).replace(" ",""))
             
-            @@沒有close*的欄位
-            MA20_Month = np.average(df_his_price[df_his_price["Close*"].apply(want_value)]["Close*"].apply(transform_to_number).iloc[:20])
+            # @@沒有close*的欄位
+            
+            MA20_Month = np.average(df_his_price[df_his_price["Close Close price adjusted for splits."].apply(want_value)]["Close Close price adjusted for splits."].apply(transform_to_number).iloc[:20])
             print(company_name, "MA20 price:", MA20_Month)
 
 
